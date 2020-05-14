@@ -1,16 +1,10 @@
 package example
 
-import (
-	"api-template/booter"
-	"net/http"
-)
+import "api-template/booter"
 
 func Main() {
-	http.ListenAndServe(":3000", &server{})
-}
-
-type server struct{}
-
-func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	booter.GetRouter()(writer, request)
+	err := booter.Run(":3000")
+	if err != nil {
+		panic(err)
+	}
 }

@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	booter.AddHandler("/login", func() booter.HandleBase {
+	booter.AddHandler("/login", func() booter.Handler {
 		return &Login{}
 	})
 }

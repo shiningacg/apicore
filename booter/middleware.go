@@ -2,14 +2,9 @@ package booter
 
 import (
 	"context"
+	"errors"
 	"net/http"
 )
-
-var middlewareMap = make([]MiddleWare, 0, 10)
-
-func AddMiddleware(ware MiddleWare) {
-	middlewareMap = append(middlewareMap, ware)
-}
 
 type MiddleWare interface {
 	// handler可以通过ctx来控制流程
@@ -20,6 +15,24 @@ type MiddleWare interface {
 	Index() int
 }
 
+var middlewareMap = make([]MiddleWare, 0, 10)
+
+func AddMiddleware(ware MiddleWare) {
+	if len(middlewareMap) == 0 || middlewareMap[len(middlewareMap)-1].Index() <= ware.Index() {
+		middlewareMap = append(middlewareMap, ware)
+		return
+	}
+	for i, md := range middlewareMap {
+		if md.Index() <= ware.Index() {
+			continue
+		}
+		front := middlewareMap[:i]
+		back := append([]MiddleWare{ware}, middlewareMap[i:]...)
+		middlewareMap = append(front, back...)
+		break
+	}
+}
+
 func Break(ctx context.Context) context.Context {
 	return context.WithValue(ctx, "SYS_BREAK", true)
 }
@@ -28,15 +41,31 @@ func isBreak(ctx context.Context) bool {
 	return ctx.Value("SYS_BREAK") != nil
 }
 
-func LoadMiddleware(ctx context.Context, r *http.Request, handler func(context.Context, *http.Request) context.Context) context.Context {
+func loadChan(ctx context.Context, r *http.Request, handler Handler) context.Context {
 	var _md MiddleWare
+	var err error
 	for _, _md = range middlewareMap {
 		ctx = _md.Before(ctx, r)
 		if isBreak(ctx) {
 			goto END
 		}
 	}
-	ctx = handler(ctx, r)
+	// TODO: 加入业务处理前钩子
+
+	// 验证数据合理性
+	getRequest(handler, r)
+	err = handler.IsValid()
+	// 数据无效则跳过处理
+	if err != nil {
+		ctx = SetResponse(ctx, NewClientErrorResponse(errors.New("无效数据")))
+		goto AFTER
+	}
+
+	// 开始处理
+	ctx = handler.Handle(ctx, r)
+
+AFTER:
+	// 后半段中间件调用
 	for i := len(middlewareMap) - 1; i > 0; i-- {
 		_md = middlewareMap[i]
 		ctx = _md.After(ctx, r)
