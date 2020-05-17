@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+func init() {
+	apicore.AddMiddleware(&Get{})
+}
+
 type Get struct{}
 
 func (g *Get) Before(ctx context.Context, request *http.Request) context.Context {
@@ -21,11 +25,11 @@ func (g *Get) Before(ctx context.Context, request *http.Request) context.Context
 }
 
 func (g *Get) After(ctx context.Context, request *http.Request) context.Context {
-	panic("implement me")
+	return nil
 }
 
 func (g *Get) Index() int {
-	panic("implement me")
+	return -1
 }
 
 func (g *Get) getArgs(input string) map[string]string {
