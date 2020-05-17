@@ -43,9 +43,10 @@ func isBreak(ctx context.Context) bool {
 	return ctx.Value("SYS_BREAK") != nil
 }
 
-func loadChan(ctx context.Context, r *http.Request, handler Handler) context.Context {
+func loadChan(ctx context.Context, r *http.Request) context.Context {
 	var _md MiddleWare
 	var err error
+	var handler = GetHandler(ctx)
 	for _, _md = range middlewareMap {
 		ctx = _md.Before(ctx, r)
 		if isBreak(ctx) {
