@@ -1,7 +1,7 @@
 package main
 
 import (
-	"api-template"
+	"apicore"
 	"context"
 	"errors"
 	"net/http"
