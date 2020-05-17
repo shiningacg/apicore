@@ -1,3 +1,3 @@
-module api-template
+module apicore
 
 go 1.14
