@@ -1,7 +1,7 @@
-package example
+package main
 
 import (
-	"api-template/booter"
+	"api-template"
 	"context"
 	"errors"
 	"net/http"
@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	booter.AddMiddleware(&Middleware{})
+	apicore.AddMiddleware(&Middleware{})
 }
 
 type Middleware struct{}
@@ -28,9 +28,9 @@ func GetIP(remoteAddr string) string {
 
 func (m *Middleware) Before(ctx context.Context, request *http.Request) context.Context {
 	if GetIP(request.RemoteAddr) == "127.0.0.1" {
-		ctx = booter.SetResponse(ctx, booter.NewClientErrorResponse(errors.New("127")))
+		ctx = apicore.SetResponse(ctx, apicore.NewClientErrorResponse(errors.New("127")))
 		ctx = context.WithValue(ctx, MWN, true)
-		return booter.Break(ctx)
+		return apicore.Break(ctx)
 	}
 	return ctx
 }

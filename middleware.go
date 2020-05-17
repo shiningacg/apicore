@@ -1,4 +1,4 @@
-package booter
+package apicore
 
 import (
 	"context"
@@ -17,6 +17,7 @@ type MiddleWare interface {
 
 var middlewareMap = make([]MiddleWare, 0, 10)
 
+// 添加中间件
 func AddMiddleware(ware MiddleWare) {
 	if len(middlewareMap) == 0 || middlewareMap[len(middlewareMap)-1].Index() <= ware.Index() {
 		middlewareMap = append(middlewareMap, ware)
@@ -33,6 +34,7 @@ func AddMiddleware(ware MiddleWare) {
 	}
 }
 
+// 跳出链式操作
 func Break(ctx context.Context) context.Context {
 	return context.WithValue(ctx, "SYS_BREAK", true)
 }

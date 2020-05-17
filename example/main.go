@@ -1,9 +1,11 @@
-package example
+package main
 
-import "api-template/booter"
+import (
+	"api-template"
+)
 
-func Main() {
-	err := booter.Run(":3000")
+func main() {
+	err := apicore.Run(":3000")
 	if err != nil {
 		panic(err)
 	}

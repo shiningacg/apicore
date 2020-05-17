@@ -1,4 +1,4 @@
-package booter
+package apicore
 
 import (
 	"context"
