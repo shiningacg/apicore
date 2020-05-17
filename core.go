@@ -13,7 +13,7 @@ func Run(host string) error {
 type server struct{}
 
 func (s *server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	var res *Response
+	var res Response
 	var ctx = request.Context()
 	// 寻找路径，匹配处理方法
 	if fun, ok := handleMap[request.RequestURI]; ok {
