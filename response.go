@@ -52,11 +52,40 @@ func getRequest(target interface{}, r *http.Request) {
 func SetResponse(ctx context.Context, response Response) context.Context {
 	return context.WithValue(ctx, "SYS_RESPONSE", response)
 }
-
 func getResponse(ctx context.Context) Response {
 	l := ctx.Value("SYS_RESPONSE")
 	if l == nil {
 		return NewServerErrorResponse(errors.New("no response"))
 	}
 	return l.(Response)
+}
+
+func getHead(ctx context.Context) map[string]string {
+	heads := ctx.Value("SYS_HEAD")
+	if heads == nil {
+		return make(map[string]string, 0)
+	}
+	return heads.(map[string]string)
+}
+func SetHead(ctx context.Context, head string, content string) context.Context {
+	var heads map[string]string
+	if ctx.Value("SYS_HEAD") == nil {
+		heads = make(map[string]string)
+		heads[head] = content
+		return context.WithValue(ctx, "SYS_HEAD", heads)
+	}
+	heads = ctx.Value("SYS_HEAD").(map[string]string)
+	heads[head] = content
+	return ctx
+}
+
+func getStatusCode(ctx context.Context) int {
+	code := ctx.Value("SYS_STATUSCODE")
+	if code == nil {
+		return 500
+	}
+	return code.(int)
+}
+func SetStatusCode(ctx context.Context, code int) context.Context {
+	return context.WithValue(ctx, "SYS_STATUSCODE", code)
 }

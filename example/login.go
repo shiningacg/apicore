@@ -19,6 +19,7 @@ type Login struct {
 }
 
 func (l *Login) Handle(ctx context.Context, request *http.Request) context.Context {
+	ctx = apicore.SetHead(ctx, "Access-Control-Allow-Origin", "127.0.0.1:3000")
 	if l.UserName == "shlande" && l.UserPWD == "shiningacg" {
 		return apicore.SetResponse(ctx, apicore.NewSuccessResponse(nil))
 	}
