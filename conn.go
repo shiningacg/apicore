@@ -114,6 +114,7 @@ func (c *conn) Raw() *http.Request {
 // 使用完write方法后，其他设置body的方法都会失效
 func (c *conn) Write(p []byte) (n int, err error) {
 	c.writeHead()
+	c.write = true
 	return c.p.Write(p)
 }
 
@@ -127,8 +128,13 @@ func (c *conn) bytes() []byte {
 
 // 设置http响应头
 func (c *conn) writeHead() {
-	c.p.WriteHeader(c.GetCode())
+	// 控制只写入一次
+	if c.write {
+		return
+	}
 	for head, content := range c.GetHead() {
 		c.p.Header().Set(head, content)
 	}
+	// 清空head，防止重复写入
+	c.p.WriteHeader(c.GetCode())
 }

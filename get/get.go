@@ -32,9 +32,19 @@ func (g *Get) Index() int {
 }
 
 func (g *Get) getArgs(input string) map[string]string {
+	var (
+		args    []string
+		rawargs string
+	)
 	var dict = make(map[string]string)
-	rawarg := strings.Split(input, "?")[1]
-	args := strings.Split(rawarg, "&")
+	// 如果有参数
+	if args = strings.Split(input, "?"); len(rawargs) == 0 {
+		return nil
+	}
+	args = append([]string{}, args[1:]...)
+	rawargs = strings.Join(args, "")
+	// TODO:解决参数里面有&的情况
+	args = strings.Split(rawargs, "&")
 	for _, arg := range args {
 		raw := strings.Split(arg, "=")
 		dict[raw[0]] = raw[1]
