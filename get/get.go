@@ -2,30 +2,29 @@ package get
 
 import (
 	"apicore"
-	"context"
-	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
 )
 
 func init() {
-	apicore.AddMiddleware(&Get{})
+	apicore.AddMiddleware(func() apicore.MiddleWare {
+		return &Get{}
+	})
 }
 
 type Get struct{}
 
-func (g *Get) Before(ctx context.Context, request *http.Request) context.Context {
-	if request.Method == "GET" {
-		handler := apicore.GetHandler(ctx)
-		args := g.getArgs(request.RequestURI)
+func (g *Get) Before(ctx apicore.Context) {
+	if ctx.Raw().Method == "GET" {
+		handler := ctx.GetHandler()
+		args := g.getArgs(ctx.Raw().RequestURI)
 		scanStruct(handler, args)
 	}
-	return ctx
 }
 
-func (g *Get) After(ctx context.Context, request *http.Request) context.Context {
-	return nil
+func (g *Get) After(ctx apicore.Context) {
+	return
 }
 
 func (g *Get) Index() int {

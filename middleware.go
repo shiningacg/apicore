@@ -17,7 +17,8 @@ type MiddleWare interface {
 var middlewareMap = make([]MiddleWare, 0, 10)
 
 // 添加中间件
-func AddMiddleware(ware MiddleWare) {
+func AddMiddleware(generator func() MiddleWare) {
+	ware := generator()
 	if len(middlewareMap) == 0 || middlewareMap[len(middlewareMap)-1].Index() <= ware.Index() {
 		middlewareMap = append(middlewareMap, ware)
 		return

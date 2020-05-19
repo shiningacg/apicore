@@ -8,7 +8,9 @@ import (
 )
 
 func init() {
-	apicore.AddMiddleware(&Middleware{})
+	apicore.AddMiddleware(func() apicore.MiddleWare {
+		return &Middleware{}
+	})
 }
 
 type Middleware struct{}
