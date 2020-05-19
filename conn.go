@@ -28,16 +28,15 @@ type Conn interface {
 
 func NewConn(r *http.Request, p http.ResponseWriter) Context {
 	var catch = make(map[string]interface{})
-	return &conn{catch, r, func(bytes []byte) (int, error) {
-		return p.Write(bytes)
-	}}
+	return &conn{catch, r, p, false}
 }
 
 type conn struct {
 	// 存放结果
 	catch map[string]interface{}
 	req   *http.Request
-	r     func([]byte) (int, error)
+	p     http.ResponseWriter
+	write bool
 }
 
 func (c *conn) Value(key string) interface{} {
@@ -52,7 +51,7 @@ func (c *conn) SetCode(code int) {
 	c.catch["SYS_CODE"] = code
 }
 
-func (c *conn) GetCode(code int) int {
+func (c *conn) GetCode() int {
 	if code, has := c.catch["SYS_CODE"]; has {
 		return code.(int)
 	}
@@ -91,6 +90,24 @@ func (c *conn) Raw() *http.Request {
 	return c.Raw()
 }
 
+// 使用完write方法后，其他设置body的方法都会失效
 func (c *conn) Write(p []byte) (n int, err error) {
-	return c.r(p)
+	c.writeHead()
+	return c.p.Write(p)
+}
+
+// 返回可供写入的内容
+func (c *conn) bytes() []byte {
+	if c.write {
+		return nil
+	}
+	return c.GetRsp().Decode()
+}
+
+// 设置http响应头
+func (c *conn) writeHead() {
+	c.p.WriteHeader(c.GetCode())
+	for head, content := range c.GetHead() {
+		c.p.Header().Set(head, content)
+	}
 }
