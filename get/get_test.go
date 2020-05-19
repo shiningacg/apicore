@@ -21,8 +21,7 @@ func TestGet_getArgs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := &Get{}
-			if got := g.getArgs(tt.args.input); !reflect.DeepEqual(got, tt.want) {
+			if got := getArgs(tt.args.input); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getArgs() = %v, want %v", got, tt.want)
 			}
 		})
@@ -67,4 +66,24 @@ func Test_Chan(a *testing.T) {
 	scanStruct(t, args)
 	json.Unmarshal([]byte("nil"), t)
 	fmt.Println(t)
+}
+
+func Test_getArgs(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{name: "test1", args: args{"http://127.0.0.1:3000/danmu/v3/?id=1&max=1000"}, want: map[string]string{"id": "1", "max": "1000"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getArgs(tt.args.input); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getArgs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

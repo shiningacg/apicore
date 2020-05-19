@@ -18,7 +18,7 @@ type Get struct{}
 func (g *Get) Before(ctx apicore.Context) {
 	if ctx.Raw().Method == "GET" {
 		handler := ctx.GetHandler()
-		args := g.getArgs(ctx.Raw().RequestURI)
+		args := getArgs(ctx.Raw().RequestURI)
 		scanStruct(handler, args)
 	}
 }
@@ -31,14 +31,14 @@ func (g *Get) Index() int {
 	return -1
 }
 
-func (g *Get) getArgs(input string) map[string]string {
+func getArgs(input string) map[string]string {
 	var (
 		args    []string
 		rawargs string
 	)
 	var dict = make(map[string]string)
 	// 如果有参数
-	if args = strings.Split(input, "?"); len(rawargs) == 0 {
+	if args = strings.Split(input, "?"); len(rawargs) == 1 {
 		return nil
 	}
 	args = append([]string{}, args[1:]...)
