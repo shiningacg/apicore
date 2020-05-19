@@ -5,12 +5,14 @@ type Handler interface {
 	IsValid() error
 }
 
-var handleMap = make(map[string]func() Handler)
+var handleMap = make(map[Matcher]func() Handler)
 
 // 添加handler方法
-func AddHandler(path string, hdl func() Handler) {
-	if _, ok := handleMap[path]; ok {
-		panic("出现重复的路径：" + path)
+func AddHandler(matcher Matcher, hdl func() Handler) {
+	for m, _ := range handleMap {
+		if matcher == m {
+			panic("重复添加方法!")
+		}
 	}
-	handleMap[path] = hdl
+	handleMap[matcher] = hdl
 }

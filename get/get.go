@@ -47,6 +47,9 @@ func getArgs(input string) map[string]string {
 	args = strings.Split(rawargs, "&")
 	for _, arg := range args {
 		raw := strings.Split(arg, "=")
+		if len(raw) == 1 {
+			break
+		}
 		dict[raw[0]] = raw[1]
 	}
 	return dict

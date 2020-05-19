@@ -7,7 +7,7 @@ package main
 import "apicore"
 
 func init() {
-	apicore.AddHandler("/stream", func() apicore.Handler {
+	apicore.AddHandler(apicore.NewMatcher("/stream", "GET"), func() apicore.Handler {
 		return &Stream{}
 	})
 }

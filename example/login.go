@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	apicore.AddHandler("/login", func() apicore.Handler {
+	apicore.AddHandler(apicore.NewMatcher("/login"), func() apicore.Handler {
 		return &Login{}
 	})
 }
