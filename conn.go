@@ -81,7 +81,10 @@ func (c *conn) SetRsp(r Response) {
 }
 
 func (c *conn) GetRsp() Response {
-	return c.catch["SYS_RESPONSE"].(Response)
+	if r, has := c.catch["SYS_RESPONSE"]; has {
+		return r.(Response)
+	}
+	return nil
 }
 
 func (c *conn) Raw() *http.Request {
