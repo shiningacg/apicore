@@ -2,7 +2,6 @@ package main
 
 import (
 	"apicore"
-	_ "apicore/get"
 )
 
 func main() {

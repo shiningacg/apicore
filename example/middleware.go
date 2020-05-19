@@ -4,7 +4,6 @@ import (
 	"apicore"
 	"context"
 	"errors"
-	"net/http"
 	"strings"
 )
 
@@ -26,17 +25,18 @@ func GetIP(remoteAddr string) string {
 	//
 }
 
-func (m *Middleware) Before(ctx context.Context, request *http.Request) context.Context {
-	if GetIP(request.RemoteAddr) == "127.0.0.1" {
-		ctx = apicore.SetResponse(ctx, apicore.NewClientErrorResponse(errors.New("127")))
-		ctx = context.WithValue(ctx, MWN, true)
-		return apicore.Break(ctx)
+func (m *Middleware) Before(ctx apicore.Context) {
+	if GetIP(ctx.Raw().RemoteAddr) == "127.0.0.1" {
+		ctx.SetRsp(apicore.NewClientErrorResponse(errors.New("127")))
+		ctx.SetValue(MWN, true)
+		ctx.Break()
+		return
 	}
-	return ctx
+	return
 }
 
-func (m *Middleware) After(ctx context.Context, request *http.Request) context.Context {
-	return ctx
+func (m *Middleware) After(ctx apicore.Context) {
+	return
 }
 
 func (m *Middleware) Index() int {

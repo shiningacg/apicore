@@ -10,6 +10,8 @@ type Context interface {
 	// 中间件存放结果的地方
 	Value(key string) interface{}
 	SetValue(key string, value interface{})
+	GetHandler() Handler
+	Break()
 	Conn
 }
 
@@ -26,7 +28,7 @@ type Conn interface {
 
 // 流程控制：Before->Handler(writer)->After
 
-func NewConn(r *http.Request, p http.ResponseWriter) Context {
+func NewConn(r *http.Request, p http.ResponseWriter) *conn {
 	var catch = make(map[string]interface{})
 	return &conn{catch, r, p, false}
 }
@@ -45,6 +47,25 @@ func (c *conn) Value(key string) interface{} {
 
 func (c *conn) SetValue(key string, value interface{}) {
 	c.catch[key] = value
+}
+
+func (c *conn) Break() {
+	c.catch["SYS_BREAK"] = nil
+}
+
+func (c *conn) isBreak() bool {
+	if _, has := c.catch["SYS_BREAK"]; has {
+		return true
+	}
+	return false
+}
+
+func (c *conn) setHandler(handler Handler) {
+	c.catch["SYS_HANDLER"] = handler
+}
+
+func (c *conn) GetHandler() Handler {
+	return c.catch["SYS_HANDLER"].(Handler)
 }
 
 func (c *conn) SetCode(code int) {
@@ -87,7 +108,7 @@ func (c *conn) GetRsp() Response {
 }
 
 func (c *conn) Raw() *http.Request {
-	return c.Raw()
+	return c.req
 }
 
 // 使用完write方法后，其他设置body的方法都会失效

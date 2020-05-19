@@ -2,9 +2,7 @@ package main
 
 import (
 	"apicore"
-	"context"
 	"errors"
-	"net/http"
 )
 
 func init() {
@@ -18,12 +16,13 @@ type Login struct {
 	UserPWD  string `json:"user_pwd"`
 }
 
-func (l *Login) Handle(ctx context.Context, request *http.Request) context.Context {
-	ctx = apicore.SetHead(ctx, "Access-Control-Allow-Origin", "127.0.0.1:3000")
+func (l *Login) Handle(ctx apicore.Conn) {
+	ctx.SetHead("Access-Control-Allow-Origin", "127.0.0.1:3000")
 	if l.UserName == "shlande" && l.UserPWD == "shiningacg" {
-		return apicore.SetResponse(ctx, apicore.NewSuccessResponse(nil))
+		ctx.SetRsp(apicore.NewSuccessResponse(nil))
+		return
 	}
-	return apicore.SetResponse(ctx, apicore.NewClientErrorResponse(errors.New("账号错误")))
+	ctx.SetRsp(apicore.NewClientErrorResponse(errors.New("账号错误")))
 }
 
 func (l *Login) IsValid() error {

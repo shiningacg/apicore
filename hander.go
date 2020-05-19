@@ -1,12 +1,7 @@
 package apicore
 
-import (
-	"context"
-	"net/http"
-)
-
 type Handler interface {
-	Handle(ctx context.Context, request *http.Request) context.Context
+	Handle(conn Conn)
 	IsValid() error
 }
 
