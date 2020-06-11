@@ -2,6 +2,8 @@ package get
 
 import (
 	"apicore"
+	"fmt"
+	"net/url"
 	"reflect"
 	"strconv"
 	"strings"
@@ -18,8 +20,7 @@ type Get struct{}
 func (g *Get) Before(ctx apicore.Context) {
 	if ctx.Raw().Method == "GET" {
 		handler := ctx.GetHandler()
-		args := getArgs(ctx.Raw().RequestURI)
-		scanStruct(handler, args)
+		scanStruct(handler, ctx.Raw().RequestURI)
 	}
 }
 
@@ -31,31 +32,13 @@ func (g *Get) Index() int {
 	return -1
 }
 
-func getArgs(input string) map[string]string {
-	var (
-		args    []string
-		rawargs string
-	)
-	var dict = make(map[string]string)
-	// 如果有参数
-	if args = strings.Split(input, "?"); len(rawargs) == 1 {
-		return nil
+func scanStruct(target interface{}, input string) {
+	u, err := url.Parse(input)
+	if err != nil {
+		return
 	}
-	args = append([]string{}, args[1:]...)
-	rawargs = strings.Join(args, "")
-	// TODO:解决参数里面有&的情况
-	args = strings.Split(rawargs, "&")
-	for _, arg := range args {
-		raw := strings.Split(arg, "=")
-		if len(raw) == 1 {
-			break
-		}
-		dict[raw[0]] = raw[1]
-	}
-	return dict
-}
-
-func scanStruct(target interface{}, args map[string]string) {
+	m := u.Query()
+	fmt.Println(m.Get("id"), m.Get("max"))
 	v := reflect.ValueOf(target).Elem()
 	t := reflect.TypeOf(target).Elem()
 	count := v.NumField()
@@ -64,10 +47,10 @@ func scanStruct(target interface{}, args map[string]string) {
 		fieldType := v.Field(i).Type()
 		fieldName := t.Field(i).Name
 		fieldTag := t.Field(i).Tag.Get("json")
-		if temp, hasField := args[strings.ToLower(fieldName)]; hasField {
+		if temp := m.Get(strings.ToLower(fieldName)); temp != "" {
 			value = temp
 		}
-		if temp, hasTag := args[fieldTag]; hasTag {
+		if temp := m.Get(fieldTag); temp != "" {
 			value = temp
 		}
 		if value == "" {

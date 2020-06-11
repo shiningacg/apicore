@@ -54,6 +54,20 @@ func Test_scanStruct(t *testing.T) {
 	}
 }
 
+func Test_scanStruct2(t *testing.T) {
+	input := "http://127.0.0.1:3000/danmu/v3/?id=1&max=1000"
+	type Input1 struct {
+		Id  int `json:"id"`
+		Max int `json:"max"`
+	}
+	t1 := &Input1{}
+	scanStruct2(t1, input)
+	want1 := &Input1{Id: 1, Max: 1000}
+	if !reflect.DeepEqual(t1, want1) {
+		t.Errorf("got %v, want %v", t1, want1)
+	}
+}
+
 // 测试错误的json是不是会影响get到的数据
 func Test_Chan(a *testing.T) {
 	type Test1 struct {
