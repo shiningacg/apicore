@@ -104,7 +104,7 @@ func (c *conn) GetRsp() Response {
 	if r, has := c.catch["SYS_RESPONSE"]; has {
 		return r.(Response)
 	}
-	return nil
+	return NewSuccessResponse(nil)
 }
 
 func (c *conn) Raw() *http.Request {
