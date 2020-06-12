@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PostFile</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<script>
+  function file() {
+    var e = document.getElementById("file")
+    var fd = new FormData()
+    fd.append('file',e.files[0])
+    axios.post('/upload',fd).catch(err=> console.log(err))
+  }
+</script>
+<input type="file" id="file" onchange="file()"/>
+</body>
+</html>

@@ -8,7 +8,9 @@ func TestAddMiddleware(t *testing.T) {
 	input := map[string]int{"t1": 1, "t2": 4, "t3": 3, "t4": 2}
 	want := []string{"t1", "t4", "t3"}
 	for key, value := range input {
-		AddMiddleware(t_middleware{name: key, index: value})
+		AddMiddleware(func() MiddleWare {
+			return t_middleware{name: key, index: value}
+		})
 	}
 	index := 0
 	for i, _ := range want {
