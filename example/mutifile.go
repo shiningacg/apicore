@@ -20,7 +20,6 @@ type MultiFile struct {
 }
 
 func (m *MultiFile) Handle(conn apicore.Conn) {
-	fmt.Println(m.File)
 	if m.File == nil {
 		bt, err := ioutil.ReadFile("PostFile.html")
 		if err != nil {
@@ -33,6 +32,11 @@ func (m *MultiFile) Handle(conn apicore.Conn) {
 		return
 	}
 	file, err := os.Create(m.File.FileName())
+	if err != nil {
+		conn.SetRsp(apicore.NewServerErrorResponse(err))
+	}
+	defer file.Close()
+	defer m.File.Close()
 	if err != nil {
 		conn.SetRsp(apicore.NewServerErrorResponse(err))
 	}
