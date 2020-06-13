@@ -32,6 +32,8 @@ func (m *Multipart) Before(ctx apicore.Context) {
 		}
 		// 读到文件
 		if item.FileName() != "" {
+			fmt.Println(item.FileName(), item.FormName())
+			var file io.ReadCloser
 			// 初始化缓存
 			if catches == nil {
 				catches = make([]byte, MaxCatchSize)
@@ -42,13 +44,12 @@ func (m *Multipart) Before(ctx apicore.Context) {
 				fmt.Println(err)
 				continue
 			}
-			fmt.Println(n)
 			if n < MaxCatchSize {
 				fmt.Println("catches")
 				data := make([]byte, n)
 				copy(data, catches[:n])
 				reader := bytes.NewReader(data)
-				ctx.SetValue(item.FormName(), &File{name: item.FileName(), ReadCloser: &BufferFile{reader}})
+				file = &File{name: item.FileName(), ReadCloser: &BufferFile{reader}}
 			}
 			// 超过缓存，写入文件
 			if n == MaxCatchSize {
@@ -62,7 +63,13 @@ func (m *Multipart) Before(ctx apicore.Context) {
 				io.Copy(f, bytes.NewReader(catches))
 				io.Copy(f, item)
 				f.Seek(0, io.SeekStart)
-				ctx.SetValue(item.FormName(), &File{name: item.FileName(), ReadCloser: &IOFile{name: tempName, File: f}})
+				file = &IOFile{name: tempName, File: f}
+			}
+			// 添加文件
+			fs := ctx.Value(item.FormName())
+			mf := &File{name: item.FileName(), ReadCloser: file}
+			if fs == nil {
+				ctx.SetValue(item.FormName(), mf)
 			}
 		}
 	}
