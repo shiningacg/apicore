@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var MaxCatchSize = 1024 * 1024 * 1
+var MaxCachesSize = 1024 * 1024 * 1
 
 func init() {
 	apicore.AddMiddleware(func() apicore.MiddleWare {
@@ -20,7 +20,7 @@ func init() {
 type Multipart struct{}
 
 func (m *Multipart) Before(ctx apicore.Context) {
-	var catches []byte
+	var caches []byte
 	form, err := ctx.Raw().MultipartReader()
 	if err != nil {
 		return
@@ -35,24 +35,24 @@ func (m *Multipart) Before(ctx apicore.Context) {
 			fmt.Println(item.FileName(), item.FormName())
 			var file io.ReadCloser
 			// 初始化缓存
-			if catches == nil {
-				catches = make([]byte, MaxCatchSize)
+			if caches == nil {
+				caches = make([]byte, MaxCachesSize)
 			}
 			// 尝试读入缓存中
-			n, err := _copy(catches, item)
+			n, err := _copy(caches, item)
 			if err != nil {
 				fmt.Println(err)
 				continue
 			}
-			if n < MaxCatchSize {
-				fmt.Println("catches")
+			if n < MaxCachesSize {
+				fmt.Println("caches")
 				data := make([]byte, n)
-				copy(data, catches[:n])
+				copy(data, caches[:n])
 				reader := bytes.NewReader(data)
 				file = &File{name: item.FileName(), ReadCloser: &BufferFile{reader}}
 			}
 			// 超过缓存，写入文件
-			if n == MaxCatchSize {
+			if n == MaxCachesSize {
 				fmt.Println("tofile")
 				tempName := md5V3(item.FileName())
 				f, err := os.Create(tempName)
@@ -60,7 +60,7 @@ func (m *Multipart) Before(ctx apicore.Context) {
 					fmt.Println(err)
 					continue
 				}
-				io.Copy(f, bytes.NewReader(catches))
+				io.Copy(f, bytes.NewReader(caches))
 				io.Copy(f, item)
 				f.Seek(0, io.SeekStart)
 				file = &IOFile{name: tempName, File: f}
@@ -90,7 +90,7 @@ func _copy(dst []byte, reader io.Reader) (int, error) {
 		if err != nil {
 			return 0, err
 		}
-		if total == MaxCatchSize {
+		if total == MaxCachesSize {
 			return total, nil
 		}
 	}

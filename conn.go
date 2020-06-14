@@ -29,58 +29,58 @@ type Conn interface {
 // 流程控制：Before->Handler(writer)->After
 
 func NewConn(r *http.Request, p http.ResponseWriter) *conn {
-	var catch = make(map[string]interface{})
-	return &conn{catch, r, p, false}
+	var caches = make(map[string]interface{})
+	return &conn{caches, r, p, false}
 }
 
 type conn struct {
 	// 存放结果
-	catch map[string]interface{}
-	req   *http.Request
-	p     http.ResponseWriter
-	write bool
+	caches map[string]interface{}
+	req    *http.Request
+	p      http.ResponseWriter
+	write  bool
 }
 
 func (c *conn) Value(key string) interface{} {
-	return c.catch[key]
+	return c.caches[key]
 }
 
 func (c *conn) SetValue(key string, value interface{}) {
-	c.catch[key] = value
+	c.caches[key] = value
 }
 
 func (c *conn) Break() {
-	c.catch["SYS_BREAK"] = nil
+	c.caches["SYS_BREAK"] = nil
 }
 
 func (c *conn) isBreak() bool {
-	if _, has := c.catch["SYS_BREAK"]; has {
+	if _, has := c.caches["SYS_BREAK"]; has {
 		return true
 	}
 	return false
 }
 
 func (c *conn) setHandler(handler Handler) {
-	c.catch["SYS_HANDLER"] = handler
+	c.caches["SYS_HANDLER"] = handler
 }
 
 func (c *conn) GetHandler() Handler {
-	return c.catch["SYS_HANDLER"].(Handler)
+	return c.caches["SYS_HANDLER"].(Handler)
 }
 
 func (c *conn) SetCode(code int) {
-	c.catch["SYS_CODE"] = code
+	c.caches["SYS_CODE"] = code
 }
 
 func (c *conn) GetCode() int {
-	if code, has := c.catch["SYS_CODE"]; has {
+	if code, has := c.caches["SYS_CODE"]; has {
 		return code.(int)
 	}
 	return 200
 }
 
 func (c *conn) SetHead(head string, content string) {
-	if heads, has := c.catch["SYS_HEAD"]; has {
+	if heads, has := c.caches["SYS_HEAD"]; has {
 		heads.(map[string]string)[head] = content
 		return
 	}
@@ -90,18 +90,18 @@ func (c *conn) SetHead(head string, content string) {
 }
 
 func (c *conn) GetHead() map[string]string {
-	if heads, has := c.catch["SYS_HEAD"]; has {
+	if heads, has := c.caches["SYS_HEAD"]; has {
 		return heads.(map[string]string)
 	}
 	return nil
 }
 
 func (c *conn) SetRsp(r Response) {
-	c.catch["SYS_RESPONSE"] = r
+	c.caches["SYS_RESPONSE"] = r
 }
 
 func (c *conn) GetRsp() Response {
-	if r, has := c.catch["SYS_RESPONSE"]; has {
+	if r, has := c.caches["SYS_RESPONSE"]; has {
 		return r.(Response)
 	}
 	return NewSuccessResponse(nil)
