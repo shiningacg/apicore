@@ -1,7 +1,7 @@
 package get
 
 import (
-	"apicore"
+	"github.com/shiningacg/apicore"
 	"net/url"
 )
 

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"apicore"
 	"errors"
+	"github.com/shiningacg/apicore"
 )
 
 func init() {

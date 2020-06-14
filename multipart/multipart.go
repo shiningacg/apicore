@@ -1,10 +1,10 @@
 package multipart
 
 import (
-	"apicore"
 	"bytes"
 	"crypto/md5"
 	"fmt"
+	"github.com/shiningacg/apicore"
 	"io"
 	"os"
 )

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"apicore"
-	_ "apicore/get"
+	"github.com/shiningacg/apicore"
+	_ "github.com/shiningacg/apicore/get"
 )
 
 func main() {

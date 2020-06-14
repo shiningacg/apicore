@@ -1,9 +1,9 @@
 package main
 
 import (
-	"apicore"
 	"context"
 	"errors"
+	"github.com/shiningacg/apicore"
 	"strings"
 )
 

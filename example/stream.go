@@ -4,7 +4,7 @@ package main
 	这个文件是用来测试write是否按照正常的流程运行的
 */
 
-import "apicore"
+import "github.com/shiningacg/apicore"
 
 func init() {
 	apicore.AddHandler(apicore.NewMatcher("/stream", "GET"), func() apicore.Handler {

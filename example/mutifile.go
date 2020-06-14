@@ -1,9 +1,9 @@
 package main
 
 import (
-	"apicore"
-	"apicore/multipart"
 	"fmt"
+	"github.com/shiningacg/apicore"
+	"github.com/shiningacg/apicore/multipart"
 	"io"
 	"io/ioutil"
 	"os"
